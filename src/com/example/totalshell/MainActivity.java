@@ -16,6 +16,8 @@ import android.app.ActivityManager.RunningServiceInfo;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
@@ -36,6 +38,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.SimpleAdapter.ViewBinder;
+import android.widget.Toast;
 
 @SuppressLint("ValidFragment")
 public class MainActivity extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -99,8 +102,8 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 	Handler handler = new Handler(){
 	    @Override
 	    public void handleMessage(Message msg) {
-//			listView = (ListView) findViewById(R.id.list_view);
-//			MainActivity.this.LoadList(MainActivity.this);
+			listView = (ListView) findViewById(R.id.list_view);
+			MainActivity.this.LoadList(MainActivity.this);
 //			View container = findViewById(R.id.container);
 //			View list = container.findViewById(R.id.list_view);
 	    }
@@ -116,6 +119,8 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
 		selfList.clear();
 		loadedPackageName.clear();
+		boolean isIncludeSystem = SettingState.isIncludeSystem(context);
+		boolean includeService = SettingState.isIncludeService(context);
 		try {
 			ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 			List<RunningAppProcessInfo> runningTasks = am.getRunningAppProcesses();
@@ -127,11 +132,14 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 				if (appName == null || appName.length() < 1 || loadedPackageName.contains(appName)) {
 					continue;
 				}
+				if (getPackageName().equals(appName)) {
+					continue;
+				}
 				ApplicationInfo ai = pInfo.getInfo(appName);
 				if (ai == null) {
 					continue;
 				}
-				if (/*null==null ||*/ (ai.flags & ApplicationInfo.FLAG_SYSTEM) == 0
+				if (/*null==null ||*/ isIncludeSystem || (ai.flags & ApplicationInfo.FLAG_SYSTEM) == 0
 						/*|| (runningTasks.get(i).processName).equals("com.android.contacts") || (runningTasks.get(i).processName).equals("com.android.email")
 						|| (runningTasks.get(i).processName).equals("com.android.settings") || (runningTasks.get(i).processName).equals("com.android.music")
 						|| (runningTasks.get(i).processName).equals("com.android.calendar")
@@ -154,40 +162,45 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 				}
 			}
 
-			for (int i = 0; i < services.size(); i++) {
-				String appName = services.get(i).process;
-				if (appName == null || appName.length() < 1) {
-					continue;
-				}
-				appName = appName.split(":")[0];
-				if (loadedPackageName.contains(appName)) {
-					continue;
-				}
-				ApplicationInfo ai = pInfo.getInfo(appName);
-				if (ai == null) {
-					continue;
-				}
-				if (/*null == null || */(ai.flags & ApplicationInfo.FLAG_SYSTEM) == 0
-						/*|| (services.get(i).process).equals("com.android.contacts") || (services.get(i).process).equals("com.android.email")
-						|| (services.get(i).process).equals("com.android.settings") || (services.get(i).process).equals("com.android.music")
-						|| (services.get(i).process).equals("com.android.calendar")
-						|| (services.get(i).process).equals("com.android.calculator2")
-						|| (services.get(i).process).equals("com.android.browser") || (services.get(i).process).equals("com.android.camera")
-						|| (services.get(i).process).equals("com.cooliris.media") || (services.get(i).process).equals("com.android.bluetooth")
-						|| (services.get(i).process).equals("com.android.mms")*/) {
-					String dir = ai.publicSourceDir;
-					Float size = Float.valueOf((float) ((new File(dir).length() * 1.0)));// 获得应用程序的大小如果size大于一M就用M为单位，否则用KB
-					HashMap<String, Object> map = new HashMap<String, Object>();
-					map.put("icon", ai.loadIcon(pm));
-					map.put("name", ai.loadLabel(pm));
-					if (size > 1024 * 1024)
-						map.put("info", size / 1024 / 1024 + " MB");
-					else
-						map.put("info", size / 1024 + " KB");
-					map.put("packagename", appName);// 获得包名给后面用
-//					Log.wtf("zzz", appName + "  " + ai.loadLabel(pm));
-					selfList.add(map);
-					loadedPackageName.add(appName);
+			if(includeService){
+				for (int i = 0; i < services.size(); i++) {
+					String appName = services.get(i).process;
+					if (appName == null || appName.length() < 1) {
+						continue;
+					}
+					appName = appName.split(":")[0];
+					if (loadedPackageName.contains(appName)) {
+						continue;
+					}
+					if (getPackageName().equals(appName)) {
+						continue;
+					}
+					ApplicationInfo ai = pInfo.getInfo(appName);
+					if (ai == null) {
+						continue;
+					}
+					if (/*null == null || */(ai.flags & ApplicationInfo.FLAG_SYSTEM) == 0
+							/*|| (services.get(i).process).equals("com.android.contacts") || (services.get(i).process).equals("com.android.email")
+							|| (services.get(i).process).equals("com.android.settings") || (services.get(i).process).equals("com.android.music")
+							|| (services.get(i).process).equals("com.android.calendar")
+							|| (services.get(i).process).equals("com.android.calculator2")
+							|| (services.get(i).process).equals("com.android.browser") || (services.get(i).process).equals("com.android.camera")
+							|| (services.get(i).process).equals("com.cooliris.media") || (services.get(i).process).equals("com.android.bluetooth")
+							|| (services.get(i).process).equals("com.android.mms")*/) {
+						String dir = ai.publicSourceDir;
+						Float size = Float.valueOf((float) ((new File(dir).length() * 1.0)));// 获得应用程序的大小如果size大于一M就用M为单位，否则用KB
+						HashMap<String, Object> map = new HashMap<String, Object>();
+						map.put("icon", ai.loadIcon(pm));
+						map.put("name", ai.loadLabel(pm));
+						if (size > 1024 * 1024)
+							map.put("info", size / 1024 / 1024 + " MB");
+						else
+							map.put("info", size / 1024 + " KB");
+						map.put("packagename", appName);// 获得包名给后面用
+	//					Log.wtf("zzz", appName + "  " + ai.loadLabel(pm));
+						selfList.add(map);
+						loadedPackageName.add(appName);
+					}
 				}
 			}
 		} catch (Exception ex) {
@@ -208,6 +221,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		SimpleAdapter listadapter = new SimpleAdapter(this, selfList, R.layout.package_list, new String[] { "icon", "name", "info" }, new int[] { R.id.icon,
 				R.id.name, R.id.info });
 		listView.setAdapter(listadapter);
+//		listadapter.notifyDataSetChanged();
 
 		// 下面这个方法主要是用来刷新图片，因为pInfo.getInfo(runningTasks.get(i).processName).loadIcon(pm)获得图片不能被显示出
 		listadapter.setViewBinder(new ViewBinder() {
@@ -232,8 +246,11 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 				
 				selfList.remove(position);
 				((SimpleAdapter)parent.getAdapter()).notifyDataSetChanged();
-				
-				execShellCmd("am force-stop " + packageName);
+//				boolean isUseRoot = SettingState.isUseRoot(MainActivity.this);
+//				if(!isUseRoot){
+//					execShellCmd("am force-stop " + packageName);
+//				}
+				execShellCmdRoot("am force-stop " + packageName);
 				
 			}
 		}); // 为listview的item添加长按事件
@@ -343,8 +360,39 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		int id = item.getItemId();
 		Log.wtf("zzz", "onOptionsItemSelected:" + id);
 		if (id == R.id.action_settings) {
+			OnCancelListener listener = new OnCancelListener() {
+				@Override
+				public void onCancel(DialogInterface arg0) {
+//					handler.sendEmptyMessage(0);
+					listView = (ListView) findViewById(R.id.list_view);
+					MainActivity.this.LoadList(MainActivity.this);
+				}
+			};
+			SettingDialog dialog = new SettingDialog(MainActivity.this, listener);
+			dialog.setTitle("设置");
+			dialog.show();
 			return true;
 		}
+		
+		if (id == R.id.action_refresh) {
+			listView = (ListView) findViewById(R.id.list_view);
+			MainActivity.this.LoadList(MainActivity.this);
+			return true;
+		}
+
+		if (item.getItemId() == R.id.action_example) {
+			Toast.makeText(MainActivity.this, "Example action.", Toast.LENGTH_SHORT).show();
+			for(HashMap<?, ?> map : selfList){
+				String packageName = (String) map.get("packagename");
+				execShellCmdRoot("am force-stop " + packageName);
+			}
+			selfList.clear();
+			((SimpleAdapter)listView.getAdapter()).notifyDataSetChanged();
+			finish();
+			System.exit(0);
+			return true;
+		}
+		
 		return super.onOptionsItemSelected(item);
 	}
 
@@ -470,10 +518,25 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			return null;
 		}
 	}
-	private void execShellCmd(String cmd) {
+	private void execShellCmdRoot(String cmd) {
 		try {
 			// 申请获取root权限，这一步很重要，不然会没有作用
 			Process process = Runtime.getRuntime().exec("su");
+			// 获取输出流
+			OutputStream outputStream = process.getOutputStream();
+			DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+			dataOutputStream.writeBytes(cmd);
+			dataOutputStream.flush();
+			dataOutputStream.close();
+			outputStream.close();
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+	}
+	private void execShellCmd(String cmd) {
+		try {
+			// 申请获取root权限，这一步很重要，不然会没有作用
+			Process process = Runtime.getRuntime().exec("");
 			// 获取输出流
 			OutputStream outputStream = process.getOutputStream();
 			DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
