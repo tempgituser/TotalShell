@@ -79,7 +79,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			public void onDrawerClosed(View view) {
 				getActionBar().setTitle(mTitle);
 				invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-				Log.wtf("zzz", "onDrawerClosed" + view.getId());
+//				Log.wtf("zzz", "onDrawerClosed" + view.getId());
 				
 //				if(selectNumber == 1){
 //					listView = (ListView) findViewById(R.id.list_view);
@@ -92,7 +92,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			public void onDrawerOpened(View drawerView) {
 				getActionBar().setTitle(mTitle);
 				invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-				Log.wtf("zzz", "onDrawerOpened" + drawerView.getId());
+//				Log.wtf("zzz", "onDrawerOpened" + drawerView.getId());
 			}
 		};
 		// Set the drawer toggle as the DrawerListener
@@ -152,10 +152,11 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 					HashMap<String, Object> map = new HashMap<String, Object>();
 					map.put("icon", ai.loadIcon(pm));
 					map.put("name", ai.loadLabel(pm));
-					if (size > 1024 * 1024)
-						map.put("info", size / 1024 / 1024 + " MB");
-					else
-						map.put("info", size / 1024 + " KB");
+//					if (size > 1024 * 1024)
+//						map.put("info", size / 1024 / 1024 + " MB");
+//					else
+//						map.put("info", size / 1024 + " KB");
+					map.put("info", appName);
 					map.put("packagename", appName);// 获得包名给后面用
 					selfList.add(map);
 					loadedPackageName.add(appName);
@@ -192,10 +193,11 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 						HashMap<String, Object> map = new HashMap<String, Object>();
 						map.put("icon", ai.loadIcon(pm));
 						map.put("name", ai.loadLabel(pm));
-						if (size > 1024 * 1024)
-							map.put("info", size / 1024 / 1024 + " MB");
-						else
-							map.put("info", size / 1024 + " KB");
+//						if (size > 1024 * 1024)
+//							map.put("info", size / 1024 / 1024 + " MB");
+//						else
+//							map.put("info", size / 1024 + " KB");
+						map.put("info", appName);
 						map.put("packagename", appName);// 获得包名给后面用
 	//					Log.wtf("zzz", appName + "  " + ai.loadLabel(pm));
 						selfList.add(map);
@@ -292,10 +294,11 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		map.put("name", pInfo.getInfo(packageName).loadLabel(pm));
 		String dir = pInfo.getInfo(packageName).publicSourceDir;
 		Float size = Float.valueOf((float) ((new File(dir).length() * 1.0)));
-		if (size > 1024 * 1024)
-			map.put("info", size / 1024 / 1024 + " MB");
-		else
-			map.put("info", size / 1024 + " KB");
+//		if (size > 1024 * 1024)
+//			map.put("info", size / 1024 / 1024 + " MB");
+//		else
+//			map.put("info", size / 1024 + " KB");
+		map.put("info", packageName);
 		map.put("packagename", packageName);
 		selfList.add(map);
 	}
@@ -358,7 +361,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		Log.wtf("zzz", "onOptionsItemSelected:" + id);
+//		Log.wtf("zzz", "onOptionsItemSelected:" + id);
 		if (id == R.id.action_settings) {
 			OnCancelListener listener = new OnCancelListener() {
 				@Override
