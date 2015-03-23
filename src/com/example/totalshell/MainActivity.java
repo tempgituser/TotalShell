@@ -99,6 +99,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		((DrawerLayout) findViewById(R.id.drawer_layout)).setDrawerListener(mDrawerToggle);
 	}
 
+	@SuppressLint("HandlerLeak")
 	Handler handler = new Handler(){
 	    @Override
 	    public void handleMessage(Message msg) {
@@ -109,14 +110,25 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 	    }
 	};
 	
+	boolean needFresh = false;
 	@Override
 	public void onResume(){
 		super.onResume();
+		if(needFresh){
+			MainActivity.this.LoadList(MainActivity.this);
+			needFresh = false;
+		}
+	}
+	
+	@Override
+	public void onStop(){
+		super.onStop();
+		needFresh = true;
 	}
 	
 	List<String> loadedPackageName = new ArrayList<String>();
 	private void LoadList(Context context) {
-		ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
+//		ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
 		selfList.clear();
 		loadedPackageName.clear();
 		boolean isIncludeSystem = SettingState.isIncludeSystem(context);
@@ -218,6 +230,9 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 //		addSelf(context, "com.github.shadowsocks");
 //		addSelf(context, "org.proxydroid");
 		
+		if (listView == null) {
+			listView = (ListView) findViewById(R.id.list_view);
+		}
 		SimpleAdapter listadapter = new SimpleAdapter(this, selfList, R.layout.package_list, new String[] { "icon", "name", "info" }, new int[] { R.id.icon,
 				R.id.name, R.id.info });
 		listView.setAdapter(listadapter);
@@ -533,6 +548,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			t.printStackTrace();
 		}
 	}
+	@SuppressWarnings("unused")
 	private void execShellCmd(String cmd) {
 		try {
 			// 申请获取root权限，这一步很重要，不然会没有作用
@@ -549,6 +565,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void execShellCmds(String[] cmds) {
 		try {
 			// 申请获取root权限，这一步很重要，不然会没有作用
