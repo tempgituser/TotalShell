@@ -402,6 +402,9 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			Toast.makeText(MainActivity.this, "Example action.", Toast.LENGTH_SHORT).show();
 			for(HashMap<?, ?> map : selfList){
 				String packageName = (String) map.get("packagename");
+				if (getPackageName().equals(packageName)) {
+					continue;
+				}
 				execShellCmdRoot("am force-stop " + packageName);
 			}
 			selfList.clear();
