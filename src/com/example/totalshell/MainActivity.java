@@ -15,6 +15,7 @@ import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -38,6 +39,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.SimpleAdapter.ViewBinder;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 @SuppressLint("ValidFragment")
@@ -254,20 +256,59 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		}); // 为listView添加item的点击事件
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			public void onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
 				HashMap<?, ?> map = (HashMap<?, ?>) parent.getItemAtPosition(position);
-				String packageName = (String) map.get("packagename");
+				final String packageName = (String) map.get("packagename");
 //				Intent intent = new Intent();
 //				intent = pm.getLaunchIntentForPackage(packageName);
 //				startActivity(intent);
 				
-				selfList.remove(position);
-				((SimpleAdapter)parent.getAdapter()).notifyDataSetChanged();
-//				boolean isUseRoot = SettingState.isUseRoot(MainActivity.this);
-//				if(!isUseRoot){
-//					execShellCmd("am force-stop " + packageName);
-//				}
-				execShellCmdRoot("am force-stop " + packageName);
+				switch(selectNumber){
+					case 1:
+						selfList.remove(position);
+						((SimpleAdapter)parent.getAdapter()).notifyDataSetChanged();
+//						boolean isUseRoot = SettingState.isUseRoot(MainActivity.this);
+//						if(!isUseRoot){
+//							execShellCmd("am force-stop " + packageName);
+//						}
+						execShellCmdRoot("am force-stop " + packageName);
+						break;
+					case 2:
+//						Dialog d = new Dialog(MainActivity.this);
+//						d.show();
+						TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener(){
+
+							@Override
+							public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+								
+								Message m = new Message();
+								Bundle b = new Bundle();
+								b.putString("packageName", packageName);
+								m.setData(b);
+								
+								selfList.remove(position);
+								((SimpleAdapter)parent.getAdapter()).notifyDataSetChanged();
+								
+								waitHandler.sendMessageDelayed(m, (hourOfDay * 60 + minute) * 60 * 1000);
+
+							}
+							
+						};
+						
+						
+						TimePickerDialog timepicker = new TimePickerDialog(MainActivity.this, onTimeSetListener, 0, 10, true);
+						timepicker.show();
+						
+						
+						break;
+					default:
+						break;
+						
+						
+						
+						
+				}
+				
 				
 			}
 		}); // 为listview的item添加长按事件
@@ -301,6 +342,18 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 //		});
 	}
 
+	Handler waitHandler = new Handler(){
+
+	    @Override
+	    public void handleMessage(Message msg) {
+			String packageName = msg.getData().getString("packageName");
+			execShellCmdRoot("am force-stop " + packageName);
+	    }
+		
+		
+		
+	};
+	
 	ArrayList<HashMap<String, Object>> selfList = new ArrayList<HashMap<String, Object>>();
 	public void addSelf(Context t, String packageName){
 		MyPackageInfo pInfo = new MyPackageInfo(t);
@@ -472,7 +525,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 				rootView = inflater.inflate(R.layout.list_fragment_main, container, false);
 				break;
 			case 2:
-				rootView = inflater.inflate(R.layout.fragment_main, container, false);
+				rootView = inflater.inflate(R.layout.list_fragment_main, container, false);
 				break;
 			case 3:
 				rootView = inflater.inflate(R.layout.fragment_main, container, false);
@@ -495,7 +548,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 //			MyPagerAdapter adapter = new MyPagerAdapter(getChildFragmentManager());
 //			pager.setAdapter(adapter);
 //			tabs.setViewPager(pager);
-			if(sectionNumber == 1){
+			if(sectionNumber == 1 || sectionNumber == 2){
 //				View list = view.findViewById(R.id.list_view);
 //				View c = view.findViewById(R.id.container);
 //				View ll = c.findViewById(R.id.list_view);
