@@ -301,11 +301,10 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 						
 						
 						break;
+					case 3:
+						break;
 					default:
 						break;
-						
-						
-						
 						
 				}
 				
