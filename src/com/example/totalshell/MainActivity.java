@@ -40,7 +40,6 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.SimpleAdapter.ViewBinder;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 @SuppressLint("ValidFragment")
 public class MainActivity extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -271,7 +270,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 //						if(!isUseRoot){
 //							execShellCmd("am force-stop " + packageName);
 //						}
-						execShellCmdRoot("am force-stop " + packageName);
+						killOne(packageName);
 						break;
 					case 2:
 //						Dialog d = new Dialog(MainActivity.this);
@@ -285,6 +284,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 								Bundle b = new Bundle();
 								b.putString("packageName", packageName);
 								m.setData(b);
+								m.what = HANDLER_KILL_ONE_MESSAGE;
 								
 								selfList.remove(position);
 								((SimpleAdapter)parent.getAdapter()).notifyDataSetChanged();
@@ -341,12 +341,18 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 //		});
 	}
 
+	public static final int HANDLER_KILL_ONE_MESSAGE = 1;
+	public static final int HANDLER_KILL_ALL_MESSAGE = 2;
 	Handler waitHandler = new Handler(){
 
 	    @Override
 	    public void handleMessage(Message msg) {
-			String packageName = msg.getData().getString("packageName");
-			execShellCmdRoot("am force-stop " + packageName);
+			if (msg.what == 1) {
+				String packageName = msg.getData().getString("packageName");
+				killOne(packageName);
+			} else if (msg.what == 2) {
+				killAll();
+			}
 	    }
 		
 		
@@ -451,22 +457,53 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		}
 
 		if (item.getItemId() == R.id.action_example) {
-			Toast.makeText(MainActivity.this, "Example action.", Toast.LENGTH_SHORT).show();
-			for(HashMap<?, ?> map : selfList){
-				String packageName = (String) map.get("packagename");
-				if (getPackageName().equals(packageName)) {
-					continue;
-				}
-				execShellCmdRoot("am force-stop " + packageName);
+//			Toast.makeText(MainActivity.this, "Example action.", Toast.LENGTH_SHORT).show();
+			switch(selectNumber){
+			case 1:
+				killAll();
+				break;
+			case 2:
+				TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener(){
+					
+					@Override
+					public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+						Message m = new Message();
+						m.what = HANDLER_KILL_ALL_MESSAGE;
+						waitHandler.sendMessageDelayed(m, (hourOfDay * 60 + minute) * 60 * 1000);
+					}
+				};
+				
+				TimePickerDialog timepicker = new TimePickerDialog(MainActivity.this, onTimeSetListener, 0, 10, true);
+				timepicker.show();
+				
+				break;
+			case 3:
+				break;
+			default:
+				break;
 			}
-			selfList.clear();
-			((SimpleAdapter)listView.getAdapter()).notifyDataSetChanged();
-			finish();
-			System.exit(0);
 			return true;
 		}
 		
 		return super.onOptionsItemSelected(item);
+	}
+	
+	private void killOne(String packageName){
+		execShellCmdRoot("am force-stop " + packageName);
+	}
+	
+	private void killAll(){
+		for(HashMap<?, ?> map : selfList){
+			String packageName = (String) map.get("packagename");
+			if (getPackageName().equals(packageName)) {
+				continue;
+			}
+			killOne(packageName);
+		}
+		selfList.clear();
+		((SimpleAdapter)listView.getAdapter()).notifyDataSetChanged();
+		finish();
+		System.exit(0);
 	}
 
 	/**
