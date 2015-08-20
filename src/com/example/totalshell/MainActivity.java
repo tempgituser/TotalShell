@@ -74,30 +74,25 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 //		listView = (ListView) findViewById(R.id.list_view);
 //		LoadList(this);// º”‘ÿlistview
 		
-		mDrawerToggle = new ActionBarDrawerToggle(this, (DrawerLayout) findViewById(R.id.drawer_layout), R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
-			/** Called when a drawer has settled in a completely closed state. */
-			@Override
-			public void onDrawerClosed(View view) {
-				getActionBar().setTitle(mTitle);
-				invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-//				Log.wtf("zzz", "onDrawerClosed" + view.getId());
-				
-//				if(selectNumber == 1){
-//					listView = (ListView) findViewById(R.id.list_view);
-//					MainActivity.this.LoadList(MainActivity.this);
-//				}
-			}
+//		mDrawerToggle = new ActionBarDrawerToggle(this, (DrawerLayout) findViewById(R.id.drawer_layout), R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
+//			/** Called when a drawer has settled in a completely closed state. */
+//			@Override
+//			public void onDrawerClosed(View view) {
+//				getActionBar().setTitle(mTitle);
+//				invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+//			}
+//
+//			/** Called when a drawer has settled in a completely open state. */
+//			@Override
+//			public void onDrawerOpened(View drawerView) {
+//				getActionBar().setTitle(mTitle);
+//				invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+//			}
+//		};
+//		// Set the drawer toggle as the DrawerListener
+//		((DrawerLayout) findViewById(R.id.drawer_layout)).setDrawerListener(mDrawerToggle);
+		
 
-			/** Called when a drawer has settled in a completely open state. */
-			@Override
-			public void onDrawerOpened(View drawerView) {
-				getActionBar().setTitle(mTitle);
-				invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-//				Log.wtf("zzz", "onDrawerOpened" + drawerView.getId());
-			}
-		};
-		// Set the drawer toggle as the DrawerListener
-		((DrawerLayout) findViewById(R.id.drawer_layout)).setDrawerListener(mDrawerToggle);
 	}
 
 	@SuppressLint("HandlerLeak")
