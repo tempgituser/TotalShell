@@ -57,7 +57,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 	private CharSequence mTitle;
 	private static ListView listView;
 	private PackageManager pm;
-	private ActionBarDrawerToggle mDrawerToggle;
+//	private ActionBarDrawerToggle mDrawerToggle;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +71,6 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
 		
 		pm = this.getPackageManager();
-//		listView = (ListView) findViewById(R.id.list_view);
-//		LoadList(this);// 加载listview
 		
 //		mDrawerToggle = new ActionBarDrawerToggle(this, (DrawerLayout) findViewById(R.id.drawer_layout), R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
 //			/** Called when a drawer has settled in a completely closed state. */
@@ -165,7 +163,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 //					else
 //						map.put("info", size / 1024 + " KB");
 					map.put("info", appName);
-					map.put("packagename", appName);// 获得包名给后面用
+					map.put("packagename", appName);
 					selfList.add(map);
 					loadedPackageName.add(appName);
 				}
@@ -206,8 +204,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 //						else
 //							map.put("info", size / 1024 + " KB");
 						map.put("info", appName);
-						map.put("packagename", appName);// 获得包名给后面用
-	//					Log.wtf("zzz", appName + "  " + ai.loadLabel(pm));
+						map.put("packagename", appName);
 						selfList.add(map);
 						loadedPackageName.add(appName);
 					}
@@ -218,23 +215,12 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		}
 		selfList.size();
 
-//		MyPackageInfo pInfo = new MyPackageInfo(context);// 获得PackageInfo对象
-//		HashMap<String, Object> map = new HashMap<String, Object>();
-//		map.put("icon", pInfo.getInfo("com.whatsapp").loadIcon(pm));
-//		map.put("name", pInfo.getInfo("com.whatsapp").loadLabel(pm));
-//		list
-//		selfList.clear();
-//		addSelf(context, "com.whatsapp");
-//		addSelf(context, "com.github.shadowsocks");
-//		addSelf(context, "org.proxydroid");
-		
 		if (listView == null) {
 			listView = (ListView) findViewById(R.id.list_view);
 		}
 		SimpleAdapter listadapter = new SimpleAdapter(this, selfList, R.layout.package_list, new String[] { "icon", "name", "info" }, new int[] { R.id.icon,
 				R.id.name, R.id.info });
 		listView.setAdapter(listadapter);
-//		listadapter.notifyDataSetChanged();
 
 		// 下面这个方法主要是用来刷新图片，因为pInfo.getInfo(runningTasks.get(i).processName).loadIcon(pm)获得图片不能被显示出
 		listadapter.setViewBinder(new ViewBinder() {
@@ -268,8 +254,6 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 						killOne(packageName);
 						break;
 					case 2:
-//						Dialog d = new Dialog(MainActivity.this);
-//						d.show();
 						TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener(){
 
 							@Override
@@ -338,9 +322,10 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 
 	public static final int HANDLER_KILL_ONE_MESSAGE = 1;
 	public static final int HANDLER_KILL_ALL_MESSAGE = 2;
+	@SuppressLint("HandlerLeak")
 	Handler waitHandler = new Handler(){
 
-	    @Override
+		@Override
 	    public void handleMessage(Message msg) {
 			if (msg.what == 1) {
 				String packageName = msg.getData().getString("packageName");
@@ -349,8 +334,6 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 				killAll();
 			}
 	    }
-		
-		
 		
 	};
 	
@@ -580,12 +563,8 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 //			pager.setAdapter(adapter);
 //			tabs.setViewPager(pager);
 			if(sectionNumber == 1 || sectionNumber == 2){
-//				View list = view.findViewById(R.id.list_view);
-//				View c = view.findViewById(R.id.container);
-//				View ll = c.findViewById(R.id.list_view);
-//				int a = 1;
 				listView = (ListView) view.findViewById(R.id.list_view);
-				((MainActivity)view.getContext()).LoadList(view.getContext());// 加载listview
+				((MainActivity)view.getContext()).LoadList(view.getContext());
 				
 			}
 		}
@@ -625,9 +604,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 	}
 	private void execShellCmdRoot(String cmd) {
 		try {
-			// 申请获取root权限，这一步很重要，不然会没有作用
 			Process process = Runtime.getRuntime().exec("su");
-			// 获取输出流
 			OutputStream outputStream = process.getOutputStream();
 			DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
 			dataOutputStream.writeBytes(cmd);
@@ -641,9 +618,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 	@SuppressWarnings("unused")
 	private void execShellCmd(String cmd) {
 		try {
-			// 申请获取root权限，这一步很重要，不然会没有作用
 			Process process = Runtime.getRuntime().exec("");
-			// 获取输出流
 			OutputStream outputStream = process.getOutputStream();
 			DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
 			dataOutputStream.writeBytes(cmd);
@@ -658,9 +633,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 	@SuppressWarnings("unused")
 	private void execShellCmds(String[] cmds) {
 		try {
-			// 申请获取root权限，这一步很重要，不然会没有作用
 			Process process = Runtime.getRuntime().exec("su");
-			// 获取输出流
 			OutputStream outputStream = process.getOutputStream();
 			DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
 			for (String s : cmds) {
