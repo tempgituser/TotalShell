@@ -3,7 +3,9 @@ package com.example.totalshell;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -13,6 +15,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.ActivityManager.RunningServiceInfo;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.TimePickerDialog;
@@ -38,6 +41,7 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.SimpleAdapter.ViewBinder;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 @SuppressLint("ValidFragment")
 public class MainActivity extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -162,6 +166,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 //						map.put("info", size / 1024 + " KB");
 					map.put("info", appName);
 					map.put("packagename", appName);
+					map.put("apkPath", ai.sourceDir);
 					selfList.add(map);
 					loadedPackageName.add(appName);
 				}
@@ -203,6 +208,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 //							map.put("info", size / 1024 + " KB");
 						map.put("info", appName);
 						map.put("packagename", appName);
+						map.put("apkPath", ai.sourceDir);
 						selfList.add(map);
 						loadedPackageName.add(appName);
 					}
@@ -216,8 +222,8 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		if (listView == null) {
 			listView = (ListView) findViewById(R.id.list_view);
 		}
-		SimpleAdapter listadapter = new SimpleAdapter(this, selfList, R.layout.package_list, new String[] { "icon", "name", "info" }, new int[] { R.id.icon,
-				R.id.name, R.id.info });
+		SimpleAdapter listadapter = new SimpleAdapter(this, selfList, R.layout.package_list, new String[] { "icon", "name", "info", "apkPath" }, new int[] { R.id.icon,
+				R.id.name, R.id.info, R.id.apkPath });
 		listView.setAdapter(listadapter);
 
 		// 下面这个方法主要是用来刷新图片，因为pInfo.getInfo(runningTasks.get(i).processName).loadIcon(pm)获得图片不能被显示出
@@ -279,9 +285,33 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 						
 						break;
 					case 3:
-						
-						
-						
+						final String apkPath = (String) map.get("apkPath");
+						new AlertDialog.Builder(MainActivity.this).setTitle("复制APK到SD卡").setMessage("是否要把 " + apkPath + " 复制到SD卡的/apk/路径下?")
+								.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+	
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										Date nowDate = new Date();
+										SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+										String time = formatter.format(nowDate);
+										String newApkFile = Util.getSDPath() + "/apk/" + packageName + "." + time + ".apk";
+										
+										boolean copySuccess = Util.copyFile(newApkFile, apkPath);
+										if (!copySuccess) {
+											showToast("复制到" + newApkFile + "失败");
+										} else {
+											showToast("复制到" + newApkFile + "成功");
+										}
+										
+	
+									}
+								}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+	
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										dialog.dismiss();
+									}
+								}).create().show();
 						
 						break;
 					default:
@@ -529,13 +559,9 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			View rootView;
 			switch(sectionNumber){
 			case 1:
-				rootView = inflater.inflate(R.layout.list_fragment_main, container, false);
-				break;
 			case 2:
-				rootView = inflater.inflate(R.layout.list_fragment_main, container, false);
-				break;
 			case 3:
-				rootView = inflater.inflate(R.layout.fragment_main, container, false);
+				rootView = inflater.inflate(R.layout.list_fragment_main, container, false);
 				break;
 			default:
 				rootView = super.onCreateView(inflater, container, savedInstanceState);
@@ -555,7 +581,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 //			MyPagerAdapter adapter = new MyPagerAdapter(getChildFragmentManager());
 //			pager.setAdapter(adapter);
 //			tabs.setViewPager(pager);
-			if(sectionNumber == 1 || sectionNumber == 2){
+			if(sectionNumber == 1 || sectionNumber == 2 || sectionNumber == 3){
 				listView = (ListView) view.findViewById(R.id.list_view);
 				((MainActivity)view.getContext()).LoadList(view.getContext());
 				
@@ -638,5 +664,14 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
+	}
+
+	Toast commonToast;
+	public void showToast(String s){
+		if (commonToast != null){
+			//keyToast.cancel();
+		}
+		commonToast = Toast.makeText(MainActivity.this,s,Toast.LENGTH_SHORT);
+		commonToast.show();
 	}
 }
