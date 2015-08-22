@@ -26,7 +26,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -362,14 +361,6 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		// update the main content by replacing fragments
 		FragmentManager fragmentManager = getFragmentManager();
 		fragmentManager.beginTransaction().replace(R.id.container, PlaceholderFragment.newInstance(position + 1)).commit();
-		
-		if (position == 0) {
-//			handler.sendEmptyMessageDelayed(0, 500);
-		}
-		
-//		if
-		Log.e("zzz", "onNavigationDrawerItemSelected" + String.valueOf(position));
-		
 	}
 
 	public void onSectionAttached(int number) {
@@ -415,7 +406,6 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-//		Log.wtf("zzz", "onOptionsItemSelected:" + id);
 		if (id == R.id.action_settings) {
 			OnCancelListener listener = new OnCancelListener() {
 				@Override
