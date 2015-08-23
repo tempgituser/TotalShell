@@ -95,16 +95,16 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 
 	}
 
-	@SuppressLint("HandlerLeak")
-	Handler handler = new Handler(){
-	    @Override
-	    public void handleMessage(Message msg) {
-			listView = (ListView) findViewById(R.id.list_view);
-			MainActivity.this.LoadList(MainActivity.this);
-//			View container = findViewById(R.id.container);
-//			View list = container.findViewById(R.id.list_view);
-	    }
-	};
+//	@SuppressLint("HandlerLeak")
+//	Handler handler = new Handler(){
+//	    @Override
+//	    public void handleMessage(Message msg) {
+//			listView = (ListView) findViewById(R.id.list_view);
+//			MainActivity.this.LoadList(MainActivity.this);
+////			View container = findViewById(R.id.container);
+////			View list = container.findViewById(R.id.list_view);
+//	    }
+//	};
 	
 	boolean needFresh = false;
 	@Override
@@ -370,6 +370,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 	};
 	
 	ArrayList<HashMap<String, Object>> selfList = new ArrayList<HashMap<String, Object>>();
+	// test code
 	public void addSelf(Context t, String packageName){
 		MyPackageInfo pInfo = new MyPackageInfo(t);
 		HashMap<String, Object> map = new HashMap<String, Object>();
@@ -393,6 +394,42 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		fragmentManager.beginTransaction().replace(R.id.container, PlaceholderFragment.newInstance(position + 1)).commit();
 	}
 
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		MenuItem menuItem = menu.findItem(R.id.action_example);
+		if(menuItem == null){
+			return super.onPrepareOptionsMenu(menu);
+		}
+		String title = menuItem.getTitle().toString();
+		switch (selectNumber) {
+		case 1:
+			if(!menuItem.isVisible()){
+				menuItem.setVisible(true);
+			}
+			if(menu != null && !getString(R.string.kill_all).equals(title)){
+				menu.getItem(0).setTitle(R.string.kill_all);
+			}
+			break;
+		case 2:
+			if(!menuItem.isVisible()){
+				menuItem.setVisible(true);
+			}
+			if(menuItem != null && !getString(R.string.kill_all_delay).equals(title)){
+				menuItem.setTitle(R.string.kill_all_delay);
+			}
+			break;
+		case 3:
+			if(menuItem.isVisible()){
+				menuItem.setVisible(false);
+			}
+			break;
+		default:
+			break;
+		}
+			
+		return super.onPrepareOptionsMenu(menu);
+	}
+	
 	public void onSectionAttached(int number) {
 		switch (number) {
 		case 1:

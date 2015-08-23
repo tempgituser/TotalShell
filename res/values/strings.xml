@@ -7,7 +7,10 @@
     <string name="title_section3">复制APK</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="action_example">结束全部</string>
+    <string name="action_example">example</string>
+    <string name="kill_all">结束全部</string>
+    <string name="kill_all_delay">定时结束全部</string>
+    <string name="action_refresh">刷新</string>
     <string name="action_settings">设置</string>
     <string name="drawer_open">drawer_open</string>
     <string name="drawer_close">drawer_close</string>

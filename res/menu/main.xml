@@ -5,12 +5,12 @@
     <item
         android:id="@+id/action_example"
         android:showAsAction="withText|ifRoom"
-        android:title="@string/action_example"/>
+        android:title="@string/kill_all"/>
     <item
         android:id="@+id/action_refresh"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="刷新"/>
+        android:title="@string/action_refresh"/>
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
