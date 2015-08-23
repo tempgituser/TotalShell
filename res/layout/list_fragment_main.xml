@@ -22,4 +22,13 @@
     android:orientation="vertical" >
 </ListView>
     
+
+<!--     <ProgressBar -->
+<!--         android:id="@+id/progress" -->
+<!--         style="?android:attr/progressBarStyleHorizontal" -->
+<!--         android:layout_width="fill_parent" -->
+<!--         android:layout_height="wrap_content" -->
+<!--         android:visibility="visible" -->
+<!--         android:max="100" /> -->
+    
 </RelativeLayout>

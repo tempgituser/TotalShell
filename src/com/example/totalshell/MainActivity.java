@@ -296,7 +296,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 										String time = formatter.format(nowDate);
 										String newApkFile = Util.getSDPath() + "/apk/" + packageName + "." + time + ".apk";
 										
-										boolean copySuccess = Util.copyFile(newApkFile, apkPath);
+										boolean copySuccess = Util.copyFile(MainActivity.this, newApkFile, apkPath);
 										if (!copySuccess) {
 											showToast("¸´ÖÆµ½" + newApkFile + "Ê§°Ü");
 										} else {
